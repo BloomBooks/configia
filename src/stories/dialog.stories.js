@@ -1,11 +1,11 @@
 import React from "react";
 import { action } from "@storybook/addon-actions";
 
-import { SabaiDialog } from "../SabaiDialog";
+import { TestPane } from "../TestPane";
 
-export const Dialog = () => <SabaiDialog />;
+export const Pane = () => <TestPane />;
 
 export default {
   title: "Dialog",
-  component: Dialog,
+  component: Pane,
 };
