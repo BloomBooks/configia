@@ -17,6 +17,9 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Checkbox from "@material-ui/core/Checkbox";
 import TextField from "@material-ui/core/TextField";
 import { ConfigiaAppBar } from "./ConfigiaAppBar";
+import Radio from "@material-ui/core/Radio";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import RadioGroup from "@material-ui/core/RadioGroup";
 
 interface IConfigiaPaneProps {
   english: string;
@@ -197,4 +200,40 @@ export const ConfigiaBoolean: React.FunctionComponent<{
   );
 
   return <ConfigiaRow control={control} {...props} />;
+};
+
+export const ConfigiaRadioGroup: React.FunctionComponent<{
+  value: any;
+  english: string;
+}> = (props) => {
+  return (
+    <RadioGroup name={props.english} value={props.value}>
+      {props.children}
+    </RadioGroup>
+  );
+};
+
+export const ConfigiaRadio: React.FunctionComponent<{
+  value: any;
+  english: string;
+}> = (props) => {
+  const control = (
+    <FormControlLabel
+      value={props.value}
+      control={<Radio />}
+      label={props.english}
+    />
+  );
+
+  return (
+    <React.Fragment>
+      <ListItem button>
+        <FormControlLabel
+          value={props.value}
+          control={<Radio />}
+          label={props.english}
+        />
+      </ListItem>
+    </React.Fragment>
+  );
 };
