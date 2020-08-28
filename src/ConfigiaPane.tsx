@@ -21,6 +21,8 @@ import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
 
+import { Store } from "pullstate";
+
 interface IConfigiaPaneProps {
   english: string;
   store: object;
@@ -191,21 +193,30 @@ export const ConfigiaRow: React.FunctionComponent<{
   );
 };
 
+function getCheckedStateProps(props: any) {
+  return {
+    checked: props.store!.useState(props.get),
+    onChange: (e: any) =>
+      props.store!.update((s: any) => props.set(s, e.target.checked)),
+  };
+}
+function getStringStateProps(props: any) {
+  return {
+    value: props.store!.useState(props.get),
+    onChange: (e: any) =>
+      props.store!.update((s: any) => props.set(s, e.target.value)),
+  };
+}
 export const ConfigiaInput: React.FunctionComponent<{
   english: string;
   get: (data: any) => string;
   set: (data: any, v: string) => void;
-  store?: object;
+  store?: Store;
 }> = (props) => {
   return (
     <ConfigiaRow
       {...props}
-      control={
-        <TextField
-          value={props.get(props.store)}
-          onChange={(e) => props.set(props.store, e.target.value)}
-        ></TextField>
-      }
+      control={<TextField {...getStringStateProps(props)}></TextField>}
     ></ConfigiaRow>
   );
 };
@@ -215,22 +226,26 @@ export const ConfigiaBoolean: React.FunctionComponent<{
   english: string;
   englishSecondary?: string;
   immediateEffect?: boolean;
+  get: (data: any) => boolean;
+  set: (data: any, v: boolean) => void;
+  store?: Store;
 }> = (props) => {
   const control = !!props.immediateEffect ? (
-    <Switch checked={props.value} />
+    <Switch {...getCheckedStateProps(props)} />
   ) : (
-    <Checkbox checked={props.value} />
+    <Checkbox {...getCheckedStateProps(props)} />
   );
 
   return <ConfigiaRow control={control} {...props} />;
 };
 
 export const ConfigiaRadioGroup: React.FunctionComponent<{
-  value: any;
   english: string;
+  get: (data: any) => string;
+  set: (data: any, v: string) => void;
 }> = (props) => {
   return (
-    <RadioGroup name={props.english} value={props.value}>
+    <RadioGroup name={props.english} {...getStringStateProps(props)}>
       {props.children}
     </RadioGroup>
   );

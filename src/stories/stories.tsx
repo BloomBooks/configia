@@ -10,28 +10,54 @@ import {
   ConfigiaRadio,
 } from "../ConfigiaPane";
 
-const initialstore = { dog: { name: "Sanuk" }, bird: { name: "Poly" } };
+import { Store } from "pullstate";
+
+interface IPetSettings {
+  dog: { name: string; friendly: boolean };
+  bird: { name: string; kind: string };
+}
+
+const settings = new Store<IPetSettings>({
+  dog: { name: "Sanuk", friendly: true },
+  bird: { name: "Poly", kind: "parrot" },
+});
 
 export const Pets: React.FunctionComponent<{}> = (props) => {
   return (
-    <ConfigiaPane english="Pet Settings" store={initialstore}>
+    <ConfigiaPane english="Pet Settings" store={settings}>
       <ConfigiaGroup english="Dog">
         <ConfigiaInput
           english="Name"
-          get={(store: any) => store.dog.name}
-          set={(store: any, v: string) => {
-            store.dog.name = v;
+          get={(d: IPetSettings) => d.dog.name}
+          set={(d: IPetSettings, v: string) => {
+            d.dog.name = v;
           }}
         />
         <ConfigiaBoolean
           value={true}
           english="Friendly"
           englishSecondary="Does this dog like other dogs?"
+          get={(d: IPetSettings) => d.dog.friendly}
+          set={(d: IPetSettings, v: boolean) => {
+            d.dog.friendly = v;
+          }}
         ></ConfigiaBoolean>
       </ConfigiaGroup>
       <ConfigiaGroup english="Bird">
-        <ConfigiaBoolean value={true} english="Wings" />
-        <ConfigiaRadioGroup value={"parrot"} english="Wings">
+        <ConfigiaInput
+          english="Name"
+          get={(d: IPetSettings) => d.bird.name}
+          set={(d: IPetSettings, v: string) => {
+            d.bird.name = v;
+          }}
+        />
+        <ConfigiaRadioGroup
+          english="Kind"
+          get={(d: IPetSettings) => d.bird.kind}
+          set={(d: IPetSettings, v: string) => {
+            d.bird.kind = v;
+          }}
+        >
           <ConfigiaRadio english="Parakeet" value={"parakeet"} />
           <ConfigiaRadio english="Parrot" value={"parrot"} />
         </ConfigiaRadioGroup>
