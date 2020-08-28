@@ -23,6 +23,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 
 interface IConfigiaPaneProps {
   english: string;
+  store: object;
   children: React.ReactElement<typeof ConfigiaGroup>[];
 }
 const tabBarWidth = "200px";
@@ -45,7 +46,12 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
   const wrappedGroups = React.Children.map(props.children, (c, index) => {
     return (
       <ConfigiaGroupWrapper selected={currentTab === index}>
-        {c}
+        {/* {c} */}
+        {React.cloneElement(c as React.ReactElement<any>, {
+          ...c.props,
+          store: props.store,
+        })}
+        ;
       </ConfigiaGroupWrapper>
     );
   });
@@ -113,7 +119,17 @@ export const ConfigiaGroupWrapper: React.FunctionComponent<{
 
 export const ConfigiaGroup: React.FunctionComponent<{
   english: string;
+  store?: object;
 }> = (props) => {
+  const childrenWithStore = React.Children.map(props.children, (c, index) => {
+    if (React.isValidElement(c)) {
+      return React.cloneElement(c, {
+        ...c.props,
+        store: props.store,
+      });
+    } else return null;
+  });
+
   return (
     <React.Fragment>
       <Typography
@@ -138,7 +154,7 @@ export const ConfigiaGroup: React.FunctionComponent<{
             width: 100%;
           `}
         >
-          {joinChildren(props.children, <Divider component="li" />)}
+          {joinChildren(childrenWithStore, <Divider component="li" />)}
         </List>
       </Paper>
     </React.Fragment>
@@ -176,13 +192,20 @@ export const ConfigiaRow: React.FunctionComponent<{
 };
 
 export const ConfigiaInput: React.FunctionComponent<{
-  value: string;
   english: string;
+  get: (data: any) => string;
+  set: (data: any, v: string) => void;
+  store?: object;
 }> = (props) => {
   return (
     <ConfigiaRow
       {...props}
-      control={<TextField value={props.value}></TextField>}
+      control={
+        <TextField
+          value={props.get(props.store)}
+          onChange={(e) => props.set(props.store, e.target.value)}
+        ></TextField>
+      }
     ></ConfigiaRow>
   );
 };

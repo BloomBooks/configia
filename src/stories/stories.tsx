@@ -10,11 +10,19 @@ import {
   ConfigiaRadio,
 } from "../ConfigiaPane";
 
+const initialstore = { dog: { name: "Sanuk" }, bird: { name: "Poly" } };
+
 export const Pets: React.FunctionComponent<{}> = (props) => {
   return (
-    <ConfigiaPane english="Pet Settings">
+    <ConfigiaPane english="Pet Settings" store={initialstore}>
       <ConfigiaGroup english="Dog">
-        <ConfigiaInput value={"Sabai"} english="Name" />
+        <ConfigiaInput
+          english="Name"
+          get={(store: any) => store.dog.name}
+          set={(store: any, v: string) => {
+            store.dog.name = v;
+          }}
+        />
         <ConfigiaBoolean
           value={true}
           english="Friendly"
@@ -22,7 +30,6 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
         ></ConfigiaBoolean>
       </ConfigiaGroup>
       <ConfigiaGroup english="Bird">
-        <ConfigiaInput value={"Cruz"} english="Name" />
         <ConfigiaBoolean value={true} english="Wings" />
         <ConfigiaRadioGroup value={"parrot"} english="Wings">
           <ConfigiaRadio english="Parakeet" value={"parakeet"} />
