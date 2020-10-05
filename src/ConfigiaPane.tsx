@@ -203,20 +203,24 @@ function getCheckedStateProps(props: any) {
 function getStringStateProps(props: any) {
   return {
     value: props.store!.useState(props.get),
+    error: props.store!.useState(props.getErrorMessage ?? ((s:any)=>undefined)),
+    helperText: props.store!.useState(props.getErrorMessage ?? ((s:any)=>undefined)),
     onChange: (e: any) =>
       props.store!.update((s: any) => props.set(s, e.target.value)),
+
   };
 }
 export const ConfigiaInput: React.FunctionComponent<{
   english: string;
   get: (data: any) => string;
+  getErrorMessage?: (data: any) => string | undefined;
   set: (data: any, v: string) => void;
   store?: Store;
 }> = (props) => {
   return (
     <ConfigiaRow
       {...props}
-      control={<TextField {...getStringStateProps(props)}></TextField>}
+      control={<TextField  {...getStringStateProps(props)}></TextField>}
     ></ConfigiaRow>
   );
 };

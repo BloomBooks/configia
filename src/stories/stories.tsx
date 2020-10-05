@@ -14,12 +14,12 @@ import { Store } from "pullstate";
 
 interface IPetSettings {
   dog: { name: string; friendly: boolean };
-  bird: { name: string; kind: string };
+  bird: { name: string; kind: string, nameError?:string };
 }
 
 const settings = new Store<IPetSettings>({
   dog: { name: "Sanuk", friendly: true },
-  bird: { name: "Poly", kind: "parrot" },
+  bird: { name: "Poly!", kind: "parrot" },
 });
 
 export const Pets: React.FunctionComponent<{}> = (props) => {
@@ -49,7 +49,9 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
           get={(d: IPetSettings) => d.bird.name}
           set={(d: IPetSettings, v: string) => {
             d.bird.name = v;
-          }}
+            }
+          }
+          getErrorMessage={(d: IPetSettings) => (d.bird.name.indexOf("!")>-1) ? "No punctuation allowed":undefined}
         />
         <ConfigiaRadioGroup
           english="Kind"
