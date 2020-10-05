@@ -21,8 +21,11 @@ import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
 
+import { Store } from "pullstate";
+
 interface IConfigiaPaneProps {
   english: string;
+  store: object;
   children: React.ReactElement<typeof ConfigiaGroup>[];
 }
 const tabBarWidth = "200px";
@@ -45,7 +48,12 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
   const wrappedGroups = React.Children.map(props.children, (c, index) => {
     return (
       <ConfigiaGroupWrapper selected={currentTab === index}>
-        {c}
+        {/* {c} */}
+        {React.cloneElement(c as React.ReactElement<any>, {
+          ...c.props,
+          store: props.store,
+        })}
+        ;
       </ConfigiaGroupWrapper>
     );
   });
@@ -113,7 +121,17 @@ export const ConfigiaGroupWrapper: React.FunctionComponent<{
 
 export const ConfigiaGroup: React.FunctionComponent<{
   english: string;
+  store?: object;
 }> = (props) => {
+  const childrenWithStore = React.Children.map(props.children, (c, index) => {
+    if (React.isValidElement(c)) {
+      return React.cloneElement(c, {
+        ...c.props,
+        store: props.store,
+      });
+    } else return null;
+  });
+
   return (
     <React.Fragment>
       <Typography
@@ -138,7 +156,7 @@ export const ConfigiaGroup: React.FunctionComponent<{
             width: 100%;
           `}
         >
-          {joinChildren(props.children, <Divider component="li" />)}
+          {joinChildren(childrenWithStore, <Divider component="li" />)}
         </List>
       </Paper>
     </React.Fragment>
@@ -175,14 +193,34 @@ export const ConfigiaRow: React.FunctionComponent<{
   );
 };
 
+function getCheckedStateProps(props: any) {
+  return {
+    checked: props.store!.useState(props.get),
+    onChange: (e: any) =>
+      props.store!.update((s: any) => props.set(s, e.target.checked)),
+  };
+}
+function getStringStateProps(props: any) {
+  return {
+    value: props.store!.useState(props.get),
+    error: props.store!.useState(props.getErrorMessage ?? ((s:any)=>undefined)),
+    helperText: props.store!.useState(props.getErrorMessage ?? ((s:any)=>undefined)),
+    onChange: (e: any) =>
+      props.store!.update((s: any) => props.set(s, e.target.value)),
+
+  };
+}
 export const ConfigiaInput: React.FunctionComponent<{
-  value: string;
   english: string;
+  get: (data: any) => string;
+  getErrorMessage?: (data: any) => string | undefined;
+  set: (data: any, v: string) => void;
+  store?: Store;
 }> = (props) => {
   return (
     <ConfigiaRow
       {...props}
-      control={<TextField value={props.value}></TextField>}
+      control={<TextField  {...getStringStateProps(props)}></TextField>}
     ></ConfigiaRow>
   );
 };
@@ -192,22 +230,26 @@ export const ConfigiaBoolean: React.FunctionComponent<{
   english: string;
   englishSecondary?: string;
   immediateEffect?: boolean;
+  get: (data: any) => boolean;
+  set: (data: any, v: boolean) => void;
+  store?: Store;
 }> = (props) => {
   const control = !!props.immediateEffect ? (
-    <Switch checked={props.value} />
+    <Switch {...getCheckedStateProps(props)} />
   ) : (
-    <Checkbox checked={props.value} />
+    <Checkbox {...getCheckedStateProps(props)} />
   );
 
   return <ConfigiaRow control={control} {...props} />;
 };
 
 export const ConfigiaRadioGroup: React.FunctionComponent<{
-  value: any;
   english: string;
+  get: (data: any) => string;
+  set: (data: any, v: string) => void;
 }> = (props) => {
   return (
-    <RadioGroup name={props.english} value={props.value}>
+    <RadioGroup name={props.english} {...getStringStateProps(props)}>
       {props.children}
     </RadioGroup>
   );

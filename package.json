@@ -13,6 +13,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "pullstate": "^1.16.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
@@ -42,10 +43,10 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^6.0.18",
-    "@storybook/addon-links": "^6.0.18",
-    "@storybook/addons": "^6.0.18",
+    "@storybook/addon-actions": "^6.0.26",
+    "@storybook/addon-links": "^6.0.26",
+    "@storybook/addons": "^6.0.26",
     "@storybook/preset-create-react-app": "^3.1.4",
-    "@storybook/react": "^6.0.18"
+    "@storybook/react": "^6.0.26"
   }
 }
