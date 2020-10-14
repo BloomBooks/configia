@@ -3,7 +3,7 @@ import css from "@emotion/css/macro";
 // these two lines make the css prop work on react elements
 import { jsx } from "@emotion/core";
 /** @jsx jsx */
-import React, { useState, useEffect, useMemo } from "react";
+import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ConfigiaAppBar: React.FunctionComponent<{ english: string }> = (
+export const ConfigiaAppBar: React.FunctionComponent<{ label: string }> = (
   props
 ) => {
   const classes = useStyles();
@@ -85,7 +85,7 @@ export const ConfigiaAppBar: React.FunctionComponent<{ english: string }> = (
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" css={css``}>
-          {props.english}
+          {props.label}
         </Typography>
         <div className={classes.search}>
           <div className={classes.searchIcon}>

@@ -10,58 +10,37 @@ import {
   ConfigiaRadio,
 } from "../ConfigiaPane";
 
-import { Store } from "pullstate";
-
 interface IPetSettings {
   dog: { name: string; friendly: boolean };
-  bird: { name: string; kind: string, nameError?:string };
+  bird: { name: string; kind: string; nameError?: string };
 }
-
-const settings = new Store<IPetSettings>({
+const initialValues = {
   dog: { name: "Sanuk", friendly: true },
   bird: { name: "Poly!", kind: "parrot" },
-});
+};
 
 export const Pets: React.FunctionComponent<{}> = (props) => {
   return (
-    <ConfigiaPane english="Pet Settings" store={settings}>
-      <ConfigiaGroup english="Dog">
-        <ConfigiaInput
-          english="Name"
-          get={(d: IPetSettings) => d.dog.name}
-          set={(d: IPetSettings, v: string) => {
-            d.dog.name = v;
-          }}
-        />
+    <ConfigiaPane label="Pet Settings" initialValues={initialValues}>
+      <ConfigiaGroup label="Dog">
+        <ConfigiaInput name="dog.name" label="Name" />
         <ConfigiaBoolean
-          value={true}
-          english="Friendly"
-          englishSecondary="Does this dog like other dogs?"
-          get={(d: IPetSettings) => d.dog.friendly}
-          set={(d: IPetSettings, v: boolean) => {
-            d.dog.friendly = v;
-          }}
+          name="dog.friendly"
+          label="Friendly"
+          labelSecondary="Does this dog like other dogs?"
         ></ConfigiaBoolean>
       </ConfigiaGroup>
-      <ConfigiaGroup english="Bird">
+      <ConfigiaGroup label="Bird">
         <ConfigiaInput
-          english="Name"
-          get={(d: IPetSettings) => d.bird.name}
-          set={(d: IPetSettings, v: string) => {
-            d.bird.name = v;
-            }
+          name="bird.name"
+          label="Name"
+          getErrorMessage={(d: IPetSettings) =>
+            d.bird.name.indexOf("!") > -1 ? "No punctuation allowed" : undefined
           }
-          getErrorMessage={(d: IPetSettings) => (d.bird.name.indexOf("!")>-1) ? "No punctuation allowed":undefined}
         />
-        <ConfigiaRadioGroup
-          english="Kind"
-          get={(d: IPetSettings) => d.bird.kind}
-          set={(d: IPetSettings, v: string) => {
-            d.bird.kind = v;
-          }}
-        >
-          <ConfigiaRadio english="Parakeet" value={"parakeet"} />
-          <ConfigiaRadio english="Parrot" value={"parrot"} />
+        <ConfigiaRadioGroup name="bird.kind" label="Kind">
+          <ConfigiaRadio label="Parakeet" value="parakeet" />
+          <ConfigiaRadio label="Parrot" value="parrot" />
         </ConfigiaRadioGroup>
       </ConfigiaGroup>
     </ConfigiaPane>
