@@ -48,7 +48,6 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
         {React.cloneElement(c as React.ReactElement<any>, {
           ...c.props,
         })}
-        ;
       </ConfigiaGroupWrapper>
     );
   });
