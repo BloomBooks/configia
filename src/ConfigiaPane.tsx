@@ -3,7 +3,14 @@ import css from "@emotion/css/macro";
 // these two lines make the css prop work on react elements
 import { jsx } from "@emotion/core";
 /** @jsx jsx */
-import React, { useMemo, useState, useEffect, ReactElement } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  ReactElement,
+  Fragment,
+} from "react";
+import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -16,8 +23,14 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { ConfigiaAppBar } from "./ConfigiaAppBar";
 
 import { TextField, Checkbox, Switch } from "formik-material-ui";
-import { FormControlLabel, Radio, RadioGroup } from "@material-ui/core";
-import { Field, Formik } from "formik";
+import {
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+} from "@material-ui/core";
+import { Field, Formik, useField, useFormikContext } from "formik";
 
 interface IConfigiaPaneProps {
   label: string;
@@ -180,18 +193,34 @@ function joinChildren(children: any, renderSeparator: any) {
   );
 }
 
-export const ConfigiaRow: React.FunctionComponent<{
+export const ConfigiaRowOneColumn: React.FunctionComponent<{
   label: string;
   labelSecondary?: string;
   control: React.ReactNode;
 }> = (props) => {
   return (
-    <React.Fragment>
-      <ListItem button>
-        <ListItemText primary={props.label} secondary={props.labelSecondary} />
-        <ListItemSecondaryAction>{props.control}</ListItemSecondaryAction>
-      </ListItem>
-    </React.Fragment>
+    <ListItem
+      className={"MuiListItem-alignItemsFlexStart"}
+      css={css`
+        flex-direction: column;
+      `}
+    >
+      <ListItemText primary={props.label} secondary={props.labelSecondary} />
+      {props.control}
+    </ListItem>
+  );
+};
+
+export const ConfigiaRowTwoColumns: React.FunctionComponent<{
+  label: string;
+  labelSecondary?: string;
+  control: React.ReactNode;
+}> = (props) => {
+  return (
+    <ListItem>
+      <ListItemText primary={props.label} secondary={props.labelSecondary} />
+      <ListItemSecondaryAction>{props.control}</ListItemSecondaryAction>
+    </ListItem>
   );
 };
 
@@ -221,7 +250,7 @@ export const ConfigiaInput: React.FunctionComponent<{
   getErrorMessage?: (data: any) => string | undefined;
 }> = (props) => {
   return (
-    <ConfigiaRow
+    <ConfigiaRowTwoColumns
       {...props}
       control={
         // <TextField  {...getStringStateProps(props)}></TextField>
@@ -232,7 +261,7 @@ export const ConfigiaInput: React.FunctionComponent<{
           label={props.label}
         />
       }
-    ></ConfigiaRow>
+    ></ConfigiaRowTwoColumns>
   );
 };
 
@@ -258,7 +287,7 @@ export const ConfigiaBoolean: React.FunctionComponent<{
     />
   );
 
-  return <ConfigiaRow control={control} {...props} />;
+  return <ConfigiaRowTwoColumns control={control} {...props} />;
 };
 
 export const ConfigiaRadioGroup: React.FunctionComponent<{
@@ -266,26 +295,37 @@ export const ConfigiaRadioGroup: React.FunctionComponent<{
   label: string;
 }> = (props) => {
   return (
-    <ConfigiaRow
+    // I could imagine wanting the radio buttons in the right column. There aren't any examples of this in chrome:settings.
+    // Note that normally in chrome:settings, radios are the sole child of an entire group (e.g. "on startup", "cookie settings",
+    // "safe browsing"). When the choices are short and don't need explanation, then a combobox is used instead (e.g. "Search engine")
+    // But to do that, we'll have to fix some css problems (e.g. the radio doesn't know its width and so doesn't line up properly
+    // on its left edge.)
+    <ConfigiaRowOneColumn
       {...props}
-      control={
-        <Field component={RadioGroup} name={props.name} label={props.label}>
-          {React.Children.map(props.children, (c) => {
-            const configiaRadio = c as ReactElement<{
-              label: string;
-              value: string;
-            }>;
-            return (
-              <FormControlLabel
-                value={configiaRadio.props.value}
-                control={<Radio />}
-                label={configiaRadio.props.label}
-              />
-            );
-          })}
-        </Field>
-      }
-    ></ConfigiaRow>
+      control={<ConfigiaRadioGroupRaw {...props} />}
+    ></ConfigiaRowOneColumn>
+  );
+};
+export const ConfigiaRadioGroupRaw: React.FunctionComponent<{
+  name: string;
+  label: string;
+}> = (props) => {
+  return (
+    <Field component={RadioGroup} name={props.name} label={props.label}>
+      {React.Children.map(props.children, (c) => {
+        const configiaRadio = c as ReactElement<{
+          label: string;
+          value: string;
+        }>;
+        return (
+          <FormControlLabel
+            value={configiaRadio.props.value}
+            control={<Radio />}
+            label={configiaRadio.props.label}
+          />
+        );
+      })}
+    </Field>
   );
 };
 
@@ -303,5 +343,38 @@ export const ConfigiaRadio: React.FunctionComponent<{
         />
       </ListItem>
     </React.Fragment>
+  );
+};
+
+// Use for things like a file or folder chooser.
+export const ConfigiaChooserButton: React.FunctionComponent<{
+  name: string;
+  label: string;
+  labelSecondary?: string;
+  buttonLabel: string;
+  chooseAction: (currentValue: string) => string;
+}> = (props) => {
+  const { setFieldValue } = useFormikContext();
+  const [field] = useField(props.name);
+
+  return (
+    <ConfigiaRowTwoColumns
+      {...props}
+      control={
+        <Fragment>
+          <Button
+            variant={"outlined"}
+            onClick={() => {
+              const newValue = props.chooseAction(field.value);
+              setFieldValue(props.name, newValue);
+            }}
+          >
+            {props.buttonLabel}
+          </Button>
+
+          <div>{field.value}</div>
+        </Fragment>
+      }
+    ></ConfigiaRowTwoColumns>
   );
 };

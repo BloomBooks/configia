@@ -8,6 +8,7 @@ import {
   ConfigiaBoolean,
   ConfigiaRadioGroup,
   ConfigiaRadio,
+  ConfigiaChooserButton,
 } from "../ConfigiaPane";
 
 interface IPetSettings {
@@ -29,6 +30,15 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
           label="Friendly"
           labelSecondary="Does this dog like other dogs?"
         ></ConfigiaBoolean>
+        <ConfigiaChooserButton
+          name="dog.photos"
+          label="Folder of dog photos"
+          labelSecondary="What does the dog look like?"
+          buttonLabel="Choose..."
+          chooseAction={(currentValue: string) => {
+            return "x" + (currentValue || "");
+          }}
+        ></ConfigiaChooserButton>
       </ConfigiaGroup>
       <ConfigiaGroup label="Bird">
         <ConfigiaInput
