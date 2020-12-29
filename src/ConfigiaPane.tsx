@@ -310,22 +310,25 @@ export const ConfigiaRadioGroupRaw: React.FunctionComponent<{
   name: string;
   label: string;
 }> = (props) => {
+  const [field] = useField(props.name);
   return (
-    <Field component={RadioGroup} name={props.name} label={props.label}>
+    //<Field component={RadioGroup} name={props.name} label={props.label}>
+    <RadioGroup {...field} {...props}>
       {React.Children.map(props.children, (c) => {
-        const configiaRadio = c as ReactElement<{
+        const choice = c as ReactElement<{
           label: string;
           value: string;
         }>;
         return (
           <FormControlLabel
-            value={configiaRadio.props.value}
+            key={choice.props.value}
+            value={choice.props.value}
             control={<Radio />}
-            label={configiaRadio.props.label}
+            label={choice.props.label}
           />
         );
       })}
-    </Field>
+    </RadioGroup>
   );
 };
 
