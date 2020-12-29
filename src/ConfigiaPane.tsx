@@ -32,20 +32,23 @@ import {
 } from "@material-ui/core";
 import { Field, Formik, useField, useFormikContext } from "formik";
 
+type valueGetter = () => Object;
+
 interface IConfigiaPaneProps {
   label: string;
   initialValues: object;
   children: React.ReactElement<typeof ConfigiaGroup>[];
+  setValueGetter?: (vg: valueGetter) => void;
 }
 const tabBarWidth = "200px";
 export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
   props
 ) => {
   const [currentTab, setCurrentTab] = useState(0);
-
   const groupLinks = useMemo(() => {
     return props.children.map((g: any) => (
       <Tab
+        key={g.props.label}
         label={g.props.label}
         css={css`
           font-weight: 500;
@@ -75,54 +78,64 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
         handleBlur,
         handleSubmit,
         isSubmitting,
-        /* and other goodies */
-      }) => (
-        <form onSubmit={handleSubmit}>
-          <ConfigiaAppBar label={props.label} />
-          <div
+      }) => {
+        if (props.setValueGetter)
+          props.setValueGetter(() => {
+            return values;
+          });
+        return (
+          <form
+            onSubmit={handleSubmit}
             css={css`
-              background-color: #f8f9fa;
-              height: 100vh;
-              display: flex;
-
-              .MuiTab-wrapper {
-                text-align: left;
-                align-items: start;
-              }
+              flex-grow: 1;
             `}
           >
-            <Tabs
-              value={currentTab}
-              onChange={(event: React.ChangeEvent<{}>, index: number) => {
-                setCurrentTab(index);
-              }}
-              centered={false}
-              orientation="vertical"
-              css={css`
-                width: ${tabBarWidth};
-                padding-left: 12px;
-                .MuiTabs-indicator {
-                  display: none;
-                }
-                .Mui-selected {
-                  font-weight: bold;
-                }
-              `}
-            >
-              {groupLinks}
-            </Tabs>
+            <ConfigiaAppBar label={props.label} />
             <div
-              id="groups"
               css={css`
-                width: 500px;
-                overflow-y: scroll; //allows us to scroll the groups without scrolling the heading tabs
+                background-color: #f8f9fa;
+                height: 100%;
+                display: flex;
+
+                .MuiTab-wrapper {
+                  text-align: left;
+                  align-items: start;
+                }
               `}
             >
-              {wrappedGroups}
-            </div>
-          </div>{" "}
-        </form>
-      )}
+              <Tabs
+                value={currentTab}
+                onChange={(event: React.ChangeEvent<{}>, index: number) => {
+                  setCurrentTab(index);
+                }}
+                centered={false}
+                orientation="vertical"
+                css={css`
+                  width: ${tabBarWidth};
+                  padding-left: 12px;
+                  .MuiTabs-indicator {
+                    display: none;
+                  }
+                  .Mui-selected {
+                    font-weight: bold;
+                  }
+                `}
+              >
+                {groupLinks}
+              </Tabs>
+              <div
+                id="groups"
+                css={css`
+                  width: 500px;
+                  overflow-y: scroll; //allows us to scroll the groups without scrolling the heading tabs
+                `}
+              >
+                {wrappedGroups}
+              </div>
+            </div>{" "}
+          </form>
+        );
+      }}
     </Formik>
   );
 };
