@@ -22,7 +22,7 @@ interface IPetSettings {
   dog: { name: string; friendly: boolean };
   bird: { name: string; kind: string; nameError?: string };
 }
-const initialValues = {
+const initialPetValues = {
   dog: { name: "Sanuk", friendly: true },
   bird: { name: "Poly!", kind: "parrot" },
 };
@@ -38,22 +38,10 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
         height: 300px;
       `}
     >
-      <Button
-        variant={"contained"}
-        onClick={() => {
-          console.log(getCurrentValues());
-        }}
-        css={css`
-          width: 174px;
-          margin: 20px !important;
-          margin-left: auto !important;
-        `}
-      >
-        List Values in Console
-      </Button>
       <ConfigiaPane
         label="Pet Settings"
-        initialValues={initialValues}
+        initialValues={initialPetValues}
+        showSearch={true}
         setValueGetter={(fn) => (getCurrentValues = fn)}
       >
         <ConfigiaGroup label="Dog">
@@ -92,6 +80,48 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
     </div>
   );
 };
+
+const initialLametaValues = {
+  files: { useLargeFileFolder: true },
+};
+
+export const Lameta: React.FunctionComponent<{}> = (props) => {
+  let getCurrentValues: () => object;
+
+  return (
+    <div
+      css={css`
+        display: flex;
+        flex-direction: column;
+        height: 300px;
+      `}
+    >
+      <ConfigiaPane
+        label="lameta Settings"
+        initialValues={initialLametaValues}
+        showSearch={true}
+        setValueGetter={(fn) => (getCurrentValues = fn)}
+      >
+        <ConfigiaGroup label="Files">
+          <ConfigiaBoolean
+            name="files.useLargeFileFolder"
+            label="Use Large File Folder"
+            labelSecondary="Avoid copying in large files that you already keep somewhere else (e.g. an external drive)."
+          ></ConfigiaBoolean>
+          <ConfigiaChooserButton
+            name="files.largeFileFolder"
+            label="Large File Folder Location"
+            buttonLabel="Choose..."
+            chooseAction={(currentValue: string) => {
+              return "x" + (currentValue || "");
+            }}
+          ></ConfigiaChooserButton>
+        </ConfigiaGroup>
+      </ConfigiaPane>
+    </div>
+  );
+};
+
 export default {
   title: "Pets",
   component: () => <Pets />,

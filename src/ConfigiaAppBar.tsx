@@ -77,9 +77,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ConfigiaAppBar: React.FunctionComponent<{ label: string }> = (
-  props
-) => {
+export const ConfigiaAppBar: React.FunctionComponent<{
+  label: string;
+  showSearch?: boolean;
+  values: object;
+}> = (props) => {
   const classes = useStyles();
   return (
     <AppBar position="static">
@@ -87,19 +89,32 @@ export const ConfigiaAppBar: React.FunctionComponent<{ label: string }> = (
         <Typography variant="h6" css={css``}>
           {props.label}
         </Typography>
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <SearchIcon />
+        {props.showSearch && (
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search settings"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ "aria-label": "search" }}
+            />
           </div>
-          <InputBase
-            placeholder="Search settings"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{ "aria-label": "search" }}
-          />
-        </div>
+        )}
+        <button
+          type="button"
+          css={css`
+            margin-left: auto;
+          `}
+          onClick={() => {
+            console.log(props.values);
+          }}
+        >
+          to console
+        </button>
       </Toolbar>
     </AppBar>
   );

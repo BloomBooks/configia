@@ -37,8 +37,11 @@ type valueGetter = () => Object;
 interface IConfigiaPaneProps {
   label: string;
   initialValues: object;
-  children: React.ReactElement<typeof ConfigiaGroup>[];
+  children:
+    | React.ReactElement<typeof ConfigiaGroup>
+    | React.ReactElement<typeof ConfigiaGroup>[];
   setValueGetter?: (vg: valueGetter) => void;
+  showSearch?: boolean;
 }
 const tabBarWidth = "200px";
 export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
@@ -46,7 +49,7 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
 ) => {
   const [currentTab, setCurrentTab] = useState(0);
   const groupLinks = useMemo(() => {
-    return props.children.map((g: any) => (
+    return React.Children.map(props.children, (g: any) => (
       <Tab
         key={g.props.label}
         label={g.props.label}
@@ -57,16 +60,18 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
     ));
   }, [props.children]);
 
-  const wrappedGroups = React.Children.map(props.children, (c, index) => {
-    return (
-      <ConfigiaGroupWrapper selected={currentTab === index}>
-        {/* {c} */}
-        {React.cloneElement(c as React.ReactElement<any>, {
-          ...c.props,
-        })}
-      </ConfigiaGroupWrapper>
-    );
-  });
+  const wrappedGroups = React.Children.map(
+    props.children,
+    (c: React.ReactElement<typeof ConfigiaGroup>, index) => {
+      return (
+        <ConfigiaGroupWrapper selected={currentTab === index}>
+          {React.cloneElement(c as React.ReactElement<any>, {
+            ...c.props,
+          })}
+        </ConfigiaGroupWrapper>
+      );
+    }
+  );
 
   return (
     <Formik initialValues={props.initialValues} onSubmit={(values) => {}}>
@@ -90,7 +95,11 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
               flex-grow: 1;
             `}
           >
-            <ConfigiaAppBar label={props.label} />
+            <ConfigiaAppBar
+              label={props.label}
+              showSearch={props.showSearch}
+              values={values}
+            />
             <div
               css={css`
                 background-color: #f8f9fa;
@@ -126,13 +135,15 @@ export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
               <div
                 id="groups"
                 css={css`
-                  width: 500px;
-                  overflow-y: scroll; //allows us to scroll the groups without scrolling the heading tabs
+                  width: 600px;
+                  //overflow-y: scroll; //allows us to scroll the groups without
+                  //scrolling the heading tabs
+                  overflow-y: auto;
                 `}
               >
                 {wrappedGroups}
               </div>
-            </div>{" "}
+            </div>
           </form>
         );
       }}
@@ -231,7 +242,13 @@ export const ConfigiaRowTwoColumns: React.FunctionComponent<{
 }> = (props) => {
   return (
     <ListItem>
-      <ListItemText primary={props.label} secondary={props.labelSecondary} />
+      <ListItemText
+        css={css`
+          max-width: 300px;
+        `}
+        primary={props.label}
+        secondary={props.labelSecondary}
+      />
       <ListItemSecondaryAction>{props.control}</ListItemSecondaryAction>
     </ListItem>
   );
@@ -379,6 +396,7 @@ export const ConfigiaChooserButton: React.FunctionComponent<{
       control={
         <Fragment>
           <Button
+            disabled={true}
             variant={"outlined"}
             onClick={() => {
               const newValue = props.chooseAction(field.value);
