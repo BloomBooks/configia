@@ -44,6 +44,9 @@ interface IConfigiaPaneProps {
   showSearch?: boolean;
 }
 const tabBarWidth = "200px";
+const disabledGrey = "rgba(0, 0, 0, 0.26)";
+const secondaryGrey = "rgba(0, 0, 0, 0.54)";
+
 export const ConfigiaPane: React.FunctionComponent<IConfigiaPaneProps> = (
   props
 ) => {
@@ -239,12 +242,16 @@ export const ConfigiaRowTwoColumns: React.FunctionComponent<{
   label: string;
   labelSecondary?: string;
   control: React.ReactNode;
+  disabled?: boolean;
+  height?: string;
 }> = (props) => {
   return (
     <ListItem>
       <ListItemText
         css={css`
           max-width: 300px;
+          color: ${props.disabled ? disabledGrey : "unset"};
+          ${props.height ? "height:" + props.height : ""}
         `}
         primary={props.label}
         secondary={props.labelSecondary}
@@ -386,6 +393,7 @@ export const ConfigiaChooserButton: React.FunctionComponent<{
   labelSecondary?: string;
   buttonLabel: string;
   chooseAction: (currentValue: string) => string;
+  disabled?: boolean;
 }> = (props) => {
   const { setFieldValue } = useFormikContext();
   const [field] = useField(props.name);
@@ -393,10 +401,15 @@ export const ConfigiaChooserButton: React.FunctionComponent<{
   return (
     <ConfigiaRowTwoColumns
       {...props}
+      height="50px"
       control={
-        <Fragment>
+        <div
+          css={css`
+            height: 56px; // leave room to show th path below the button
+          `}
+        >
           <Button
-            disabled={true}
+            disabled={props.disabled}
             variant={"outlined"}
             onClick={() => {
               const newValue = props.chooseAction(field.value);
@@ -406,9 +419,37 @@ export const ConfigiaChooserButton: React.FunctionComponent<{
             {props.buttonLabel}
           </Button>
 
-          <div>{field.value}</div>
-        </Fragment>
+          <div
+            css={css`
+              color: ${secondaryGrey};
+            `}
+          >
+            {field.value}
+          </div>
+        </div>
       }
     ></ConfigiaRowTwoColumns>
+  );
+};
+
+// set visibility or enabled state based on provided predicates
+export const ConfigiaConditional: React.FunctionComponent<{
+  enableWhen?: (currentValues: object) => boolean;
+  visibleWhen?: (currentValues: object) => boolean;
+}> = (props) => {
+  const { values } = useFormikContext<object>();
+  const disabled = props.enableWhen ? !props.enableWhen(values) : false;
+  const visible = props.visibleWhen ? props.visibleWhen(values) : true;
+  if (!visible) return null;
+  return (
+    <React.Fragment>
+      {React.Children.map(props.children, (child) => {
+        if (React.isValidElement(child)) {
+          // clone in order to inject this disabled prop. It's up to the child
+          // to support that prop.
+          return React.cloneElement(child, { disabled: disabled });
+        } else return child;
+      })}
+    </React.Fragment>
   );
 };

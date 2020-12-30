@@ -15,6 +15,7 @@ import {
   ConfigiaRadioGroup,
   ConfigiaRadio,
   ConfigiaChooserButton,
+  ConfigiaConditional,
 } from "../ConfigiaPane";
 import Button from "@material-ui/core/Button";
 
@@ -82,12 +83,10 @@ export const Pets: React.FunctionComponent<{}> = (props) => {
 };
 
 const initialLametaValues = {
-  files: { useLargeFileFolder: true },
+  files: { useLargeFileFolder: false },
 };
 
 export const Lameta: React.FunctionComponent<{}> = (props) => {
-  let getCurrentValues: () => object;
-
   return (
     <div
       css={css`
@@ -100,7 +99,6 @@ export const Lameta: React.FunctionComponent<{}> = (props) => {
         label="lameta Settings"
         initialValues={initialLametaValues}
         showSearch={true}
-        setValueGetter={(fn) => (getCurrentValues = fn)}
       >
         <ConfigiaGroup label="Files">
           <ConfigiaBoolean
@@ -108,14 +106,18 @@ export const Lameta: React.FunctionComponent<{}> = (props) => {
             label="Use Large File Folder"
             labelSecondary="Avoid copying in large files that you already keep somewhere else (e.g. an external drive)."
           ></ConfigiaBoolean>
-          <ConfigiaChooserButton
-            name="files.largeFileFolder"
-            label="Large File Folder Location"
-            buttonLabel="Choose..."
-            chooseAction={(currentValue: string) => {
-              return "x" + (currentValue || "");
-            }}
-          ></ConfigiaChooserButton>
+          <ConfigiaConditional
+            enableWhen={(values: any) => values.files.useLargeFileFolder}
+          >
+            <ConfigiaChooserButton
+              name="files.largeFileFolder"
+              label="Large File Folder Location"
+              buttonLabel="Choose..."
+              chooseAction={(currentValue: string) => {
+                return "x" + (currentValue || "");
+              }}
+            ></ConfigiaChooserButton>
+          </ConfigiaConditional>
         </ConfigiaGroup>
       </ConfigiaPane>
     </div>
